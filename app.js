@@ -1,24 +1,33 @@
-// app.js (o tu archivo principal)
+
 const express = require('express');
 const app = express();
 const port = 8080;
 
+// Middleware para gestionar métodos HTTP válidos
+const validarMetodosHTTP = (req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE') {
+    return res.status(405).send('Método HTTP no válido');
+  }
+  next();
+};
 
-// Importar los routers
-
+// Importa los routers
 const listViewRouter = require('./router/listViewRouter');
 const listEditRouter = require('./router/listEditRouter');
+
+// Aplica el middleware de validación de métodos HTTP a nivel de aplicación
+app.use(validarMetodosHTTP);
+
+app.use(express.json());
+
 
 app.use(listViewRouter);
 app.use(listEditRouter);
 
-
-
-
-
 app.listen(port, () => {
   console.log(`Servidor Express en funcionamiento en el puerto ${port}`);
 });
+
 
 
 
