@@ -26,14 +26,38 @@ const validarParametros = (req, res, next) => {
   next();
 };
 
-listViewRouter.get('/completed', (req, res) => {
-  res.write('Tarea completada');
-  res.end();
+// Obtener todas las tareas
+listViewRouter.get('/tareas', (req, res) => {
+  const data = fs.readFileSync('Database.txt', 'utf-8').split('\n');
+  res.status(200).json(data);
 });
 
-listViewRouter.get('/incomplete', (req, res) => {
-  res.write('Tarea Incompleta');
-  res.end();
+// Obtener una sola tarea
+app.get('/tareas/:indice', (req, res) => {
+  const indice = parseInt(req.params.indice);
+  const data = fs.readFileSync('Database.txt', 'utf-8').split('\n');
+  
+  if (indice >= 0 && indice < data.length) {
+      res.status(200).json({ tarea: data[indice] });
+  } else {
+      res.status(404).json({
+          msg: 'Tarea no encontrada'
+      });
+  }
+});
+
+// Listar tareas completas
+listViewRouter.get('/tareas/completas', (req, res) => {
+  const data = fs.readFileSync('Database.txt', 'utf-8').split('\n');
+  const tareasCompletas = data.filter(tarea => tarea.trim() !== '' && tarea.includes('[X]'));
+  res.status(200).json(tareasCompletas);
+});
+
+// Listar tareas incompletas
+listViewRouter.get('/tareas/incompletas', (req, res) => {
+  const data = fs.readFileSync('Database.txt', 'utf-8').split('\n');
+  const tareasIncompletas = data.filter(tarea => tarea.trim() !== '' && !tarea.includes('[X]'));
+  res.status(200).json(tareasIncompletas);
 });
 
 

@@ -37,17 +37,46 @@ const validarSolicitud = (req, res, next) => {
 
 listEditRouter.use(validarSolicitud);
 
-listEditRouter.put('/', (req, res) => {
-  const envioInformacion = req.body;
-  console.log(envioInformacion);
-  res.status(200).json({ message: 'PUT listEdit successful' });
+// Crear una nueva tarea
+listEditRouter.post('/tareas', (req, res) => {
+  const { tarea } = req.body;
+  fs.appendFileSync('Database.txt', tarea + '\n');
+  res.status(201).json({
+      msg: `La tarea (${tarea}) fue añadida con éxito`
+  });
 });
 
-listEditRouter.post('/', (req, res) => {
-  const envioInformacion = req.body;
-  console.log(envioInformacion);
-  res.status(200).json({ message: 'POST listEdit successful' });
+// Actualizar una tarea
+listEditRouter.put('/tareas/:indice', (req, res) => {
+  const indice = parseInt(req.params.indice);
+  const { tarea } = req.body;
+  const data = fs.readFileSync('Database.txt', 'utf-8').split('\n');
+ 
+  if (indice >= 0 && indice < data.length) {
+      data[indice] = tarea;
+      fs.writeFileSync('Database.txt', data.join('\n'));
+      res.status(200).json({ msg: 'Tarea actualizada con éxito' });
+  } else {
+      res.status(404).json({
+          msg: 'Tarea no encontrada'
+      });
+  }
 });
 
+// Eliminar una tarea
+listEditRouter.delete('/tareas/:indice', (req, res) => {
+  const indice = parseInt(req.params.indice);
+  const data = fs.readFileSync('Database.txt', 'utf-8').split('\n');
+  
+  if (indice >= 0 && indice < data.length) {
+      data.splice(indice, 1);
+      fs.writeFileSync('Database.txt', data.join('\n'));
+      res.status(200).json({ msg: 'Tarea eliminada con éxito' });
+  } else {
+      res.status(404).json({
+          msg: 'Tarea no encontrada'
+      });
+  }
+});
 module.exports = listEditRouter;
 

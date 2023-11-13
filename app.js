@@ -1,6 +1,10 @@
 
 const express = require('express');
 const app = express();
+
+const fs = require('fs');
+require ('dotenv').config();
+
 const jwt = require('jsonwebtoken'); // Importa el módulo JWT
 
 const port = process.env.PORT;
